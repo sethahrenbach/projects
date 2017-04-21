@@ -268,6 +268,7 @@ def getnodes(tree,nodes):
 def dagit(nodes,tree,dag,top,beg):
     print(nodes)
     print(dag)
+    
     if tree.data != None:
        i = nodes.index(tree.data)
        if not(tree.data in nodes[:len(dag)-beg]):
@@ -393,22 +394,23 @@ def label_dag(tree,dag,top):
     if d[-1]==[]:
         d = d[:-1]
     print(d)    
-    return(min_dag(d))
+    return(d)
 
 t1 = ".senc(.pair(.pair(.pv(k),.pv(k)),.senc(.va(k),.pv(k))),.pair(.pair(.pv(k),.pv(k)),.senc(.pv(k),.pv(k))))"
 t2 = ".senc(.pair(.pv(k),.pv(k)),.pair(.pb(m),.pv(k)))"
-
+tprime = ".pair(.pv(k),.pv(k))"
 terms = [t1,t2]
-c1 = parsenc(".senc(.pair(.pair(.pv(k),.pv(k)),.senc(.va(k),.pv(k))),.pair(.pair(.pv(k),.pv(k)),.senc(.pv(k),.pv(k))))")
+c1 = parsenc(t1)
 c2 = parsenc(t2)
-l1 = label_dag(c1,[],True)
+cprime = parsenc(tprime)
+l1 = label_dag(cprime,[],True)
 #print(l1)
 #l1 = l1[:-1]
 #for i in range(len(l1)):
 #    if i == []:
 #        l1 = l1[:i]+l1[i+1:]
 l2 = label_dag(c2,l1,True)
-
+l3 = label_dag(c1,l2,True)
 d = Dag()
 #d2 = tree_to_dag(c2,d)
 t = get_term(c1)
