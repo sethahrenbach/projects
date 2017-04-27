@@ -282,12 +282,12 @@ def dagit(nodes,tree,dag,top,beg):
            
            nodes[i]='a'
           
-           dag[k].append(nodes.index(tree.left.data))
+           dag[k].append(nodes.index(tree.left.data)+beg)
            dag = (dagit(nodes,tree.left,dag,top,beg))
            
        if tree.right != None:
            
-           dag[k].append(nodes.index(tree.right.data))
+           dag[k].append(nodes.index(tree.right.data)+beg)
            dag = (dagit(nodes,tree.right,dag,top,beg))
           # dag = dag[:len(nodes)]
 #    atoms = len(nodes) - nodes.count('a')
@@ -394,7 +394,7 @@ def label_dag(tree,dag,top):
     if d[-1]==[]:
         d = d[:-1]
     print(d)    
-    return(d)
+    return(min_dag(d))
 
 t1 = ".senc(.pair(.pair(.pv(k),.pv(k)),.senc(.va(k),.pv(k))),.pair(.pair(.pv(k),.pv(k)),.senc(.pv(k),.pv(k))))"
 t2 = ".senc(.pair(.pv(k),.pv(k)),.pair(.pb(m),.pv(k)))"
