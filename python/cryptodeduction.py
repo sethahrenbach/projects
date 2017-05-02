@@ -302,20 +302,18 @@ def dagit(nodes,tree,dag,top,beg):
     return(dag)
 
 def min_dag(dag):
-#    for i in range(len(dag)):
-#        if i == []:
-#            dag=dag[:i] + dag[i+1:]
+
     l = len(dag)
-    got_match = 1
+#    got_match = 1
     matches=[1]
-    changed = []
+#    changed = []
     while len(matches)>0:
         matches = []
-        #print(dag)
-        
+#        #print(dag)
+        secproj = []
         for i in range(l-1,-1,-1):
             for k in range(l-1,-1,-1):
-                got_match=0
+#                got_match=0
                 if dag[i][0] == '*':
                     dagi = dag[i][1:]
                 else:
@@ -324,30 +322,36 @@ def min_dag(dag):
                     dagk = dag[k][1:]
                 else:
                     dagk = dag[k][:]
-                
-                if dagi==dagk and i >k:
+#                
+#                     
+                if dagi==dagk and i >k and i not in secproj:
                     matches.append([k,i])
-                    got_match=1
-                
-        print(matches)#if got_match==1:
+#                    secproj.append(i)
+#                    got_match=1
+#                
+#        print(matches)#if got_match==1:
         for m in matches:
-            print m
-            print dag
+#            print m
+#            print dag
             for i in range(l-1,-1,-1):
                 for k in range(len(dag[i])):
                     if dag[i][k]== m[1] :
-                        changed.append(i)
+#                        changed.append(i)
                         dag[i][k]=m[0]
-            if dag[m[0]][0]=='*':
-                if dag[m[1]][0]!='*':
-                    dag[m[1]] = ['*']+dag[m[1]]
-            if dag[m[1]][0]=='*' :
+                        for n in matches:
+                            for o in [0,1]:
+                                if n[o] == m[1]:
+                                    n[o] = m[0]
+            if dag[m[1]][0]=='*':
                 if dag[m[0]][0]!='*':
                     dag[m[0]] = ['*']+dag[m[0]]
-        #    print(dag)#for m in matches:
+#            if dag[m[1]][0]=='*' :
+#                if dag[m[0]][0]!='*':
+#                    dag[m[0]] = ['*']+dag[m[0]]
+#        #    print(dag)#for m in matches:
             if m[1]<len(dag):
-                #print(m[1])
-            
+#                print(m[1])
+#            
                 for r in range(l):
                     if len(dag[r])>3:
                         if dag[r][0]=="*":
@@ -355,29 +359,30 @@ def min_dag(dag):
                                 dag[r][1] = dag[r][1] -1
                             if dag[r][2]>m[1]:
                                 dag[r][2] = dag[r][2]-1
-                            
-                                
+#                            
+#                                
                         else:
-                            if dag[r][0]>m[1]:
-                                dag[r][0] = dag[r][0] -1
-                            if dag[r][1]>m[1]:
-                                dag[r][1] = dag[r][1]-1  
+                             if dag[r][0]>m[1]:
+                                 dag[r][0] = dag[r][0] -1
+                             if dag[r][1]>m[1]:
+                                 dag[r][1] = dag[r][1]-1  
                 dag = dag[:m[1]]+dag[(m[1]+1):]
                 l=len(dag)
             else:
                 dag = dag[:m[1]]
                 l=len(dag)  
-#            b = m[1]
-#            if b == len(dag):
-#                for i in matches:
-#                    print i
-#                    if i[0] == b:
-#                        i[0] = m[0]
-#                    if i[1] == b:
-#                        i[1] = m[0]                          
-#        #print(matches)
-        
-        #print(changed)  
+##            b = m[1]
+##            if b == len(dag):
+##                for i in matches:
+##                    print i
+##                    if i[0] == b:
+##                        i[0] = m[0]
+##                    if i[1] == b:
+##                        i[1] = m[0]                          
+##        #print(matches)
+#        
+#        #print(changed) 
+#    print dag    
     return(dag)
 
 def label_dag(tree,dag,top):
@@ -412,14 +417,14 @@ terms = [t1,t2,tprime]
 c1 = parsenc(t1)
 c2 = parsenc(t2)
 cprime = parsenc(tprime)
-l1 = label_dag(cprime,[],True)
+l1 = label_dag(c1,[],True)
 #print(l1)
 #l1 = l1[:-1]
 #for i in range(len(l1)):
 #    if i == []:
 #        l1 = l1[:i]+l1[i+1:]
 l2 = label_dag(c2,l1,True)
-l3 = label_dag(c1,l2,True)
+l3 = label_dag(cprime,l2,True)
 d = Dag()
 #d2 = tree_to_dag(c2,d)
 t = get_term(c1)
@@ -432,6 +437,7 @@ def sort_by_length(terms):
         tlens[lt]=t
     newterms = []
     s = sorted(tlens)
+    s.reverse()
     for i in s:
         newterms.append(tlens[i])
     return newterms
