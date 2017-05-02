@@ -329,8 +329,10 @@ def min_dag(dag):
                     matches.append([k,i])
                     got_match=1
                 
-      #  print(matches)#if got_match==1:
+        print(matches)#if got_match==1:
         for m in matches:
+            print m
+            print dag
             for i in range(l-1,-1,-1):
                 for k in range(len(dag[i])):
                     if dag[i][k]== m[1] :
@@ -365,8 +367,15 @@ def min_dag(dag):
             else:
                 dag = dag[:m[1]]
                 l=len(dag)  
-                                      
-        #print(matches)
+#            b = m[1]
+#            if b == len(dag):
+#                for i in matches:
+#                    print i
+#                    if i[0] == b:
+#                        i[0] = m[0]
+#                    if i[1] == b:
+#                        i[1] = m[0]                          
+#        #print(matches)
         
         #print(changed)  
     return(dag)
@@ -399,7 +408,7 @@ def label_dag(tree,dag,top):
 t1 = ".senc(.pair(.pair(.pv(k),.pv(k)),.senc(.va(k),.pv(k))),.pair(.pair(.pv(k),.pv(k)),.senc(.pv(k),.pv(k))))"
 t2 = ".senc(.pair(.pv(k),.pv(k)),.pair(.pb(m),.pv(k)))"
 tprime = ".pair(.pv(k),.pv(k))"
-terms = [t1,t2]
+terms = [t1,t2,tprime]
 c1 = parsenc(t1)
 c2 = parsenc(t2)
 cprime = parsenc(tprime)
@@ -415,9 +424,22 @@ d = Dag()
 #d2 = tree_to_dag(c2,d)
 t = get_term(c1)
 
+
+def sort_by_length(terms):
+    tlens = {}
+    for t in terms:
+        lt = len(t)
+        tlens[lt]=t
+    newterms = []
+    s = sorted(tlens)
+    for i in s:
+        newterms.append(tlens[i])
+    return newterms
+
 def terms_to_dag(terms,dag):
-    print(dag)
-    print(terms)
+#    print(dag)
+#    print(terms)
+    terms = sort_by_length(terms)
     if terms != []:
         t = parsenc(terms[0])
         l = label_dag(t,dag,True)
