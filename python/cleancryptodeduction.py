@@ -94,7 +94,7 @@ def getpair(string,front):
     s = ",".join(s[:k]), ",".join(s[k:])
     return(s)
     
-def parsenc(string):
+def term_to_tree(string):
     root = Tree()
     rp = rparens(string)
     lp = lparens(string)
@@ -111,9 +111,9 @@ def parsenc(string):
             root.data = front
             s=getpair(string,front)
            
-            root.left = parsenc(s[0][6:])
+            root.left = term_to_tree(s[0][6:])
          
-            root.right = parsenc(s[1][:-1])
+            root.right = term_to_tree(s[1][:-1])
            
            
         elif front[:4]==".pi1" or front[:4]==".pi2":
@@ -122,7 +122,7 @@ def parsenc(string):
               
                 root.data = front[:-1]
                
-                root.left = parsenc(string[5:-1])
+                root.left = term_to_tree(string[5:-1])
                 root.right = None
                 
             else:
@@ -130,7 +130,7 @@ def parsenc(string):
                 root.data=None
         elif front[:2]==".ss" or front[:2]==".pk" or front[:2]==".vk" or front[:2]=='.sk':
             root.data = front[:2]
-            root.left = parsenc(string[3:-1])
+            root.left = term_to_tree(string[3:-1])
             root.right = None
            
         else:
@@ -175,7 +175,7 @@ def allsubs(terms,subterms):
         return subterms
     else:
         t = terms[0]
-        tp = parsenc(t)
+        tp = term_to_tree(t)
         st = get_subterms(tp, [])
         for i in st:
             if i not in subterms:
@@ -221,7 +221,7 @@ def newdagit(subterms,dag,subtermscopy):
         s = subterms[0]
         item = []
         if s[0] == '*':
-            t = parsenc(s[1:])
+            t = term_to_tree(s[1:])
             label = t.data
             item.append('*')
             item.append(label)
@@ -246,7 +246,7 @@ def newdagit(subterms,dag,subtermscopy):
                 dag.append(item)
                 return newdagit(subterms[1:],dag,subtermscopy)
         else:
-            t = parsenc(s)
+            t = term_to_tree(s)
             label = t.data
             item.append(label)
             if label in two_place and label != '.pi1' and label != '.pi2':
@@ -272,9 +272,9 @@ t1 = ".senc(.pair(.pair(.pv(k),.pv(k)),.senc(.va(k),.pv(k))),.pair(.pair(.pv(k),
 t2 = ".senc(.pair(.pv(k),.pv(k)),.pair(.pb(m),.pv(k)))"
 tprime = ".pair(.pv(k),.pv(k))"
 terms = [t1,t2,tprime]
-c1 = parsenc(t1)
-c2 = parsenc(t2)
-cprime = parsenc(tprime)
+c1 = term_to_tree(t1)
+c2 = term_to_tree(t2)
+cprime = term_to_tree(tprime)
 
 def terms_to_dag(terms):
     s = allsubs(terms,[])
@@ -295,7 +295,7 @@ print(dag)
 ######################################################
 
 def proj1(string):
-    t = parsenc(string)
+    t = term_to_tree(string)
     if t.data == ".pi1" and t.left.data == ".pair":
         tp = get_term(t.left.left)
         return(tp)
@@ -303,7 +303,7 @@ def proj1(string):
         return(False)
 
 def proj2(string):    
-    t = parsenc(string)
+    t = term_to_tree(string)
     if t.data == ".pi1" and t.left.data == ".pair":
         tp = get_term(t.left.right)
         return(tp)
@@ -311,7 +311,7 @@ def proj2(string):
         return(False)
    
 def sdec_senc(string):
-    t = parsenc(string)
+    t = term_to_tree(string)
     if t.data == ".sdec" and t.right.data == ".senc":
         t1 = get_term(t.left)
         t1p = get_term(t.right.left)
@@ -322,7 +322,7 @@ def sdec_senc(string):
         return(False)
 
 def position(string, binary_list):
-    t = parsenc(string)
+    t = term_to_tree(string)
     if binary_list != []:    
         i = binary_list[0]
         if i == 0:
@@ -337,7 +337,7 @@ def position(string, binary_list):
         return(False)
     
 def adec_aenc(string):
-    t = parsenc(string)
+    t = term_to_tree(string)
     if t.data == ".adec" and t.right.data == ".aenc" and t.left.data==".sk" and t.right.left.data == ".pk":
         t1 = get_term(t.left.left)
         t1p = get_term(t.right.left.left)
@@ -348,7 +348,7 @@ def adec_aenc(string):
         return(False)
     
 def veri_sign(string):
-    t = parsenc(string)
+    t = term_to_tree(string)
     if t.data == ".veri" and t.right.data == ".sign" and t.left.data==".vk" and t.right.left.data == ".ss":
         t1 = get_term(t.left.left)
         t1p = get_term(t.right.left.left)
