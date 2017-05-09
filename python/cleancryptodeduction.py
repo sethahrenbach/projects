@@ -357,4 +357,108 @@ def veri_sign(string):
             return(t2)
     else:
         return(False)
-  
+
+
+######################################################
+######################################################
+########                                       #######
+########              DEDUCTION                #######
+########              ALGORITHM                #######
+########                                       ####### 
+######################################################
+######################################################
+
+
+# Input: set of terms F, special term t. Decide if F |- t, attacker can deduce t from observed terms F.
+# 1. Get the minimal DAG of F union {t}
+# 2. Mark vertices of terms in F, mark vertices that contain public names
+# 3. For each vertex v:
+##   i. if v is marked and labeled 'pair' then mark v.left and v.right
+##   ii. if v is marked and labeled 'senc' and v.left is marked, mark v.right
+##   iii. if v is marked and labeled 'aenc', let t1 = v.left.left, if vertex for term = 'sk(t1)' is marked, mark v.right
+##   iv. if v is unmarked and labeled 'senc' or 'pair', mark if both adjacent vertices are marked
+##   v. if v is unmarked and labeld 'sk' or 'pk', mark if adjacent vertex is marked
+# 4. If new vertices marked in step 3, repeat, else check vertex for t: if t is marked, output YES, else NO.
+
+
+def marking(dag, marked):
+    added = False
+
+    for v in dag:
+        if dag.index(v) in marked and v[0]=='.pair':
+            l = v[1]
+            r = v[2]
+            if l not in marked:
+                marked.append(l)
+                added = True
+            if r not in marked:
+                marked.append(r)
+                added = True
+        elif dag.index(v) in  marked and v[0]=='.senc' and v[2] not in marked:
+            if v[1] in marked:
+                marked.append(v[2])
+                added = True
+        elif dag.index(v) in marked and v[0]=='.aenc':
+            t1 = dag[dag[v[1]][1]]
+            i = dag.index(t1)
+            for u in dag:
+                if u[0]=='.sk' and u[1]==i and v[2] not in marked:
+                    marked.append(v[2])
+                    added = True
+        elif dag.index(v) not in marked and (v[0]=='.senc' or v[0]=='.pair'):
+            if dag[v[1]] in marked and dag[v[2]] in marked and dag.index(v) not in marked:
+                marked.append(dag.index(v))
+                added = True
+        elif dag.index(v) not in marked and v[0]=='.pk' and dag.index(v) not in marked:
+            if dag[v[1]] in marked:
+                marked.append(dag.index(v))
+                added = True
+    
+    if added:
+        return marking(dag,marked)
+    else:
+        return marked	
+
+def deduce(terms, for_special):
+    # terms.append(for_special)
+    dag = terms_to_dag(terms)
+    
+    marked = []
+ 	# This preprocesses the dag
+    for v in dag:
+        if v[0] == '*':
+            marked.append(dag.index(v))
+        else:
+            if v[0] == '.pb':
+                marked.append(dag.index(v))
+	# Strip out the stars
+    for v in dag:
+        if v[0] == '*':
+            vp = v[1:]
+            dagl = dag[:dag.index(v)] 
+            dagl.append(vp) 
+            dagr = dag[dag.index(v)+1:]
+            dag = dagl + dagr		
+	
+# 	# Now recursively call a the marking function
+    
+    marked = marking(dag,marked)
+    
+    vfs = [for_special]
+    if dag.index(vfs) in marked:
+        return True
+    else:
+        return False
+
+terms2 = ['.senc(.pv(k),.pv(s))', '.pv(k)']
+fs = '.pv(s)'
+b = deduce(terms2,fs)
+print "list of terms: "
+print terms2
+print '\n'
+print "special term: "
+print fs
+print '\n'
+print "T/F: special term deducible from list of terms:\n"
+
+print b 
